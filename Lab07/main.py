@@ -72,4 +72,4 @@ plt.ylabel('y', rotation=0)
 plt.legend()
 plt.show()
 
-# Atunci cand variabila CP creste, va creste si consumul si astfel mpg va scade
+# Atunci cand variabila CP creste, va creste si consumul si astfel mpg va scadea
