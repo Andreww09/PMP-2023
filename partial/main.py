@@ -1,13 +1,13 @@
 from pgmpy.models import BayesianNetwork
 from pgmpy.factors.discrete import TabularCPD
 from pgmpy.inference import VariableElimination
-import networkx as nx
 import matplotlib.pyplot as plt
 import numpy as np
-from scipy import stats
 import pymc as pm
 import arviz as az
 
+
+# ex 1.1
 wins_j1 = 0  # de cate ori a castigat jucatorul 1
 wins_j2 = 0
 p1 = 0.5
@@ -22,28 +22,32 @@ for i in range(0, 10000):
         for j in range(0, stema_j1 + 1):  # al doilea jucator arunca de n+1 ori
             if np.random.random() < p2:
                 stema_j2 += 1
+        if stema_j1 >= stema_j2:
+            wins_j1 += 1
+        else:
+            wins_j2+=1
     else:
         if np.random.random() < p2:  # arunca al doilea jucator
             stema_j2 += 1
         for j in range(0, stema_j2 + 1):  # primul jucator arunca de n+1 ori
             if np.random.random() < p1:
                 stema_j1 += 1
-    # un joc se considera castigat daca doar un jucator a obtinut stema strict de mai multe ori
-    if stema_j1 > stema_j2:
-        wins_j1 += 1
-    elif stema_j2 > stema_j1:
-        wins_j2 += 1
+        if stema_j2 >= stema_j1:
+            wins_j2 += 1
+        else:
+            wins_j1 += 1
 
 print(f"Probabilitatea jucator 1: {wins_j1 / (wins_j1 + wins_j2)}")
 print(f"Probabilitatea jucator 2: {wins_j2 / (wins_j1 + wins_j2)}")
-# Probabilitatea jucator 1: 0.34875826335536897
-# Probabilitatea jucator 2: 0.651241736644631
+# Probabilitatea jucator 1: 0.3757
+# Probabilitatea jucator 2: 0.6243
 
 
+# ex 1.2
 model = BayesianNetwork([('J', 'R1'), ('R1', 'R2'),('J','R2')])
-# J1 - jucatorul 1
-# J2 - jucatorul 2
-# S - descrie cine a inceput jocul
+# J - descrie care jucator incepe primul
+# R1 - descrie rezultatele in prima runda
+# R2 - descrie rezultatele in a doua runda
 
 
 CPD_J = TabularCPD(variable='J', variable_card=2,
@@ -65,6 +69,7 @@ CPD_R2 = TabularCPD(variable='R2', variable_card=3, # probabilitati de a obtine 
 model.add_cpds(CPD_J, CPD_R1, CPD_R2)
 model.get_cpds()
 
+# ex 1.3
 infer = VariableElimination(model)
 posterior_p = infer.query(["J"], evidence={"R2": 1}) # stim ca s-a obtinut o singura stema in runda 2
 print(posterior_p)
@@ -79,14 +84,17 @@ print(posterior_p)
 # Al doilea jucator e mai probabil sa fi inceput jocul
 
 
+# ex 2.1
 data = np.random.normal(0, 10, 100) # generarea timpilor de asteptare
 
+# ex 2.2
 with pm.Model() as model1:
-    mu = pm.Uniform('mu', lower=0, upper=100)
-    sd = pm.HalfNormal('sd', sigma=10)
+    mu = pm.Uniform('mu', lower=0, upper=100)  # nu se pot obtine valori inafara intervalului
+    sd = pm.HalfNormal('sd', sigma=10)  # sigma e o valoare suficient de mare
     pred=pm.Normal('pred', mu=mu, sigma=sd, observed=data)
     idata_g = pm.sample(50, return_inferencedata=True,cores=1)
 
-az.plot_trace(idata_g, var_names=['mu','sd'])
+# ex 2.3
+az.plot_trace(idata_g, var_names=['mu'])    # variabila cautata este mu
 plt.show()
 
