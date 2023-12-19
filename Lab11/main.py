@@ -48,4 +48,4 @@ cmp_df = az.compare({'model_2': idatas[0], 'model_3': idatas[1],
                     method='BB-pseudo-BMA', ic="loo", scale="deviance")
 az.plot_compare(cmp_df)
 
-# din grafice rezulta ca modulul 4 este cel mai bun
+# din grafice rezulta ca modelul 4 este cel mai bun
