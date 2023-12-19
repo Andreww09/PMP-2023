@@ -35,7 +35,7 @@ for cluster in clusters:
 for i in range(0,3):
     pm.compute_log_likelihood(idatas[i], model=models[i])
 
-# se compara rezultatele waic pentru cele 3 modele: liniar, patratic si cubic
+# se compara rezultatele waic pentru cele 3 modele
 cmp_df = az.compare({'model_2': idatas[0], 'model_3': idatas[1],
                         'model_4': idatas[2]},
                     method='BB-pseudo-BMA', ic="waic", scale="deviance")
